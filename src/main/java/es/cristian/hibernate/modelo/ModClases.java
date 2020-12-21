@@ -1,12 +1,15 @@
 package es.cristian.hibernate.modelo;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "clases")
 public class ModClases implements Serializable{
+	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("PersistenciaMaestros");
+
 
 	private static final long serialVersionUID = 1L;
 	
@@ -27,11 +30,12 @@ public class ModClases implements Serializable{
 	public ModClases() {
 		
 	}
-
-	public ModClases(int clase_ID, String nombre_Cusrso, String dia_Semana) {
-		this.clase_ID = clase_ID;
+	
+	public ModClases(int id, String nombre_Cusrso, String dia_Semana, ModMaestros maestro) {
+		this.clase_ID = id;
 		this.nombre_Cusrso = nombre_Cusrso;
 		this.dia_Semana = dia_Semana;
+		this.maestros = maestro;
 	}
 
 	public int getClase_ID() {
@@ -58,8 +62,6 @@ public class ModClases implements Serializable{
 		this.dia_Semana = dia_Semana;
 	}
 	
-	
-
 	public ModMaestros getMaestros() {
 		return maestros;
 	}
@@ -70,7 +72,66 @@ public class ModClases implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Clases [clase_ID=" + clase_ID + ", nombre_Cusrso=" + nombre_Cusrso + ", dia_Semana=" + dia_Semana + "]";
+		return "Clases [clase_ID= " + clase_ID + ", nombre_Curso= " + nombre_Cusrso + ", dia_Semana= " + dia_Semana + " maestro: "+ maestros+ "]";
 	}
 	
+
+	//CRUD
+	
+	//CREATE A CLASS
+
+	public void addClase(ModClases clase) {
+		EntityManager manager = emf.createEntityManager();
+		manager = emf.createEntityManager();
+		manager.getTransaction().begin();
+		manager.persist(clase);
+		manager.getTransaction().commit();
+		manager.close();
+		System.out.println("Clase de " + clase.getNombre_Cusrso() + " agregada");
+	}
+	
+	
+	//READ CLASES 
+	
+	public void getClases() {
+		EntityManager manager = emf.createEntityManager();
+		manager = emf.createEntityManager();
+		@SuppressWarnings("unchecked")
+		List<ModClases> clases = (List<ModClases>) manager.createQuery("FROM ModClases").getResultList();
+		System.out.println("Hay " + clases.size() + " clase(s) en el sistema");
+		for(ModClases clase : clases) {
+			System.out.println(clase.toString()); 
+			}
+		manager.close();
+	}
+	
+	
+	//UPDATE CLASS
+	
+	public void updateClase(ModClases clase, int id, String nombre, String dia, ModMaestros maestro) {
+		EntityManager manager = emf.createEntityManager();
+		manager = emf.createEntityManager();
+		manager.getTransaction().begin();
+		clase = manager.merge(clase);
+		clase.setNombre_Cusrso(nombre);
+		clase.setDia_Semana(dia);
+		clase.setMaestros(maestro);
+		manager.persist(clase);
+		manager.getTransaction().commit();
+		manager.close();
+		System.out.println("Clase de " + clase.getNombre_Cusrso() + " actualizada");
+	}
+	
+	//DELETE CLASS
+	
+	public void deleteClase(ModClases clase) {
+		EntityManager manager = emf.createEntityManager();
+		manager = emf.createEntityManager();
+		manager.getTransaction().begin();
+		clase = manager.merge(clase);
+		manager.remove(clase);
+		manager.getTransaction().commit();
+		manager.close();
+		System.out.println("Clase de " + clase.getNombre_Cusrso() + " eliminada");
+	}
 }

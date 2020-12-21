@@ -4,9 +4,13 @@ import java.io.Serializable;
 import java.util.*;
 import javax.persistence.*;
 
+
 @Entity
 @Table(name = "maestros")
 public class ModMaestros implements Serializable{
+	
+	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("PersistenciaMaestros");
+
 	
 	private static final long serialVersionUID = 1L;
 
@@ -33,8 +37,12 @@ public class ModMaestros implements Serializable{
 	public ModMaestros() {
 		
 	}
+	public ModMaestros(int id) {
+		this.maestro_ID = id;
+	}
 
-	public ModMaestros(String nombre, int oficina, String telefono, String email) {
+	public ModMaestros(int id, String nombre, int oficina, String telefono, String email) {
+		this.maestro_ID = id;
 		this.nombre = nombre;
 		this.oficina = oficina;
 		this.telefono = telefono;
@@ -80,8 +88,6 @@ public class ModMaestros implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	
 
 	public List<ModClases> getClases() {
 		return clases;
@@ -101,49 +107,53 @@ public class ModMaestros implements Serializable{
 	//CRUD
 	
 
-	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("Persistencia");
-	EntityManager manager = emf.createEntityManager();
 
 	//CREATE MAESTRO
-	public void addMestro(String nombre, int oficina, String telefono, String email) {
+	
+	public void addMaestro(ModMaestros maestro) {
+		EntityManager manager = emf.createEntityManager();
 		manager = emf.createEntityManager();
-		ModMaestros m = new ModMaestros(nombre, oficina, telefono, email);
 		manager.getTransaction().begin();
-		manager.persist(m);
+		manager.persist(maestro);
 		manager.getTransaction().commit();
 		manager.close();
-	    System.out.println("Maestro "+ m.getNombre() + " agregado exitosamente");
+	    System.out.println("Maestro "+ maestro.getNombre() + " agregado exitosamente");
 		
 	}
 	
 	//READ MAESTROS
 	@SuppressWarnings("unchecked")
 	public void getMaestros() {
+		EntityManager manager = emf.createEntityManager();
 		manager = emf.createEntityManager();
 		List<ModMaestros> maestros = (List<ModMaestros>) manager.createQuery("FROM ModMaestros").getResultList();
 		System.out.println("Hay " + maestros.size() + " Maestro(s) en el sistema");
 		for(ModMaestros maestro : maestros) {
 			System.out.println(maestro.toString()); 
 			}
+		manager.close();
 	}
 	
 	//UPDATE MAESTRO
 	
-	public void updateMaestro(ModMaestros maes, String Nombre, int Oficina, String Email){
+	public void updateMaestro(ModMaestros maestro, int id, String nombre, int oficina, String telefono, String email){
+		EntityManager manager = emf.createEntityManager();
 		manager = emf.createEntityManager();
 		manager.getTransaction().begin();
-		maes = manager.merge(maes);  //Al usar el metodo merge, convierte la entidad e en managed, y asi poder ser editada
-		maes.setNombre(Nombre);
-		maes.setOficina(Oficina);
-		maes.setEmail(Email);
+		maestro = manager.merge(maestro);  //Al usar el metodo merge, convierte la entidad e en managed, y asi poder ser editada
+		maestro.setNombre(nombre);
+		maestro.setOficina(oficina);
+		maestro.setTelefono(telefono);
+		maestro.setEmail(email);
 		manager.getTransaction().commit();
 		manager.close();
-		System.out.println("El maestro de ID:"+ maes.getMaestro_ID() + " ha sido actualizado satisfactoriamente");
+		System.out.println("El maestro de ID: "+ maestro.getMaestro_ID() + " ha sido actualizado satisfactoriamente");
 	}
 	
 	//DELETE MAESTRO
 	
 	public void deleteMaestro(ModMaestros maes) {
+		EntityManager manager = emf.createEntityManager();
 		manager = emf.createEntityManager();
 		manager.getTransaction().begin();
 		maes = manager.merge(maes);
