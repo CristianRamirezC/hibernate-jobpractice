@@ -112,7 +112,7 @@ public class ModMaestros implements Serializable{
 		manager.persist(m);
 		manager.getTransaction().commit();
 		manager.close();
-	    System.out.println("Maestro agregado exitosamente");
+	    System.out.println("Maestro "+ m.getNombre() + " agregado exitosamente");
 		
 	}
 	
@@ -138,12 +138,19 @@ public class ModMaestros implements Serializable{
 		maes.setEmail(Email);
 		manager.getTransaction().commit();
 		manager.close();
+		System.out.println("El maestro de ID:"+ maes.getMaestro_ID() + " ha sido actualizado satisfactoriamente");
 	}
 	
 	//DELETE MAESTRO
 	
 	public void deleteMaestro(ModMaestros maes) {
-		
+		manager = emf.createEntityManager();
+		manager.getTransaction().begin();
+		maes = manager.merge(maes);
+		manager.remove(maes);
+		manager.getTransaction().commit();
+		manager.close();
+		System.out.println("Maestro con ID: " + maes.getMaestro_ID() + " eliminado de la base de datos");
 	}
 	
 }
